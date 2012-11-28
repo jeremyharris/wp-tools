@@ -77,14 +77,17 @@ class Shell {
 			$this->wpPath = trim($arguments[$pathArg+1], '\\/');
 		}
 		
-		return array_slice($arguments, 3);
+		return array(
+			$arguments[1],
+			array_slice($arguments, 3)
+		);
 	}
 	
 /**
  * Outputs welcome message
  */
 	protected function welcome() {
-		$this->out('hr');
+		$this->out("\n");
 		$this->out("WP Tools: A collection of tools for managing a WordPress database.");
 		$this->out("** All changes are made directly to the database and therefore permanent!");
 		$this->out("** Make sure to back it up before attempting to move it.\n");
@@ -118,8 +121,8 @@ class Shell {
  * @param boolean $newline Append a new line
  */
 	public function out($msg = '', $newline = true) {
-		$msg = " $msg";
-		if ($msg == ' hr') {
+		$msg = "$msg";
+		if ($msg == 'hr') {
 			$msg = str_repeat('-', 80);
 		} elseif ($newline) {
 			$msg .= "\n";
