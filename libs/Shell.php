@@ -63,11 +63,11 @@ class Shell {
 	}
 
 /**
- * Parses arguments sent by the CLI in a very simplistic way. Saves any argument
- * with a dash prefix, like `-t somevalue` and stores it as a key-value pair
- * using the dash-prefixed char as the key and the following key as the value.
- * The remaining arguments are saved as indexed values. The first argument is 
- * always considered the command.
+ * Parses arguments sent by the CLI in a very simplistic way. The first argument
+ * is considered the command and is in the returned array's first index. 
+ * Remaining arguments are returned as key-value pairs in the second index. 
+ * Lastly, floating arguments are returned in the third index to be passed as
+ * parameters to the method.
  * 
  * Example: pass `command -r Something Nothing -v Value
  * Yields: 
@@ -76,7 +76,9 @@ class Shell {
  *   'command',
  *   array(
  *     '-r' => 'Something',
- *     '-v' => 'Value',
+ *     '-v' => 'Value'
+ *   ),
+ *   array(
  *     'Nothing'
  *   )
  * )
@@ -87,7 +89,7 @@ class Shell {
  */
 	public function parseArgs($arguments) {
 		if (count($arguments) < 2) {
-			return array('help', array());
+			return array('help', array(), array());
 		}
 		unset($arguments[0]);
 		$method = $arguments[1];
@@ -114,12 +116,10 @@ class Shell {
 			unset($parsedArgs['-w']);
 		}
 		
-		// add standalone, ordered args
-		$parsedArgs += array_values($arguments);
-		
 		return array(
 			$method,
-			$parsedArgs
+			$parsedArgs,
+			(array)array_values($arguments)
 		);
 	}
 	

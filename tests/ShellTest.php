@@ -10,7 +10,7 @@ class ShellTest extends PHPUnit_Framework_TestCase {
 			'scriptname'
 		);
 		$results = $shell->parseArgs($arguments);
-		$expected = array('help', array());
+		$expected = array('help', array(), array());
 		$this->assertEquals($expected, $results);
 		
 		$this->assertFalse($shell->wpPath);
@@ -21,7 +21,7 @@ class ShellTest extends PHPUnit_Framework_TestCase {
 			'command'
 		);
 		$results = $shell->parseArgs($arguments);
-		$expected = array('command', array());
+		$expected = array('command', array(), array());
 		$this->assertEquals($expected, $results);
 		
 		$this->assertFalse($shell->wpPath);
@@ -34,7 +34,7 @@ class ShellTest extends PHPUnit_Framework_TestCase {
 			'/path/to/wp'
 		);
 		$results = $shell->parseArgs($arguments);
-		$expected = array('command', array());
+		$expected = array('command', array(), array());
 		$this->assertEquals($expected, $results);
 		
 		$results = $shell->wpPath;
@@ -51,9 +51,13 @@ class ShellTest extends PHPUnit_Framework_TestCase {
 			'option'
 		);
 		$results = $shell->parseArgs($arguments);
-		$expected = array('command', array(
+		$expected = array(
+			'command', 
+			array(
 			'-o' => 'option'
-		));
+			),
+			array()
+		);
 		$this->assertEquals($expected, $results);
 		
 		$results = $shell->wpPath;
@@ -70,11 +74,16 @@ class ShellTest extends PHPUnit_Framework_TestCase {
 			'other passed option'
 		);
 		$results = $shell->parseArgs($arguments);
-		$expected = array('command', array(
-			'-o' => 'option',
-			'passed option',
-			'other passed option'
-		));
+		$expected = array(
+			'command', 
+			array(
+				'-o' => 'option'
+			),
+			array(
+				'passed option',
+				'other passed option'
+			)
+		);
 		$this->assertEquals($expected, $results);
 		
 		$this->assertFalse($shell->wpPath);
@@ -93,12 +102,17 @@ class ShellTest extends PHPUnit_Framework_TestCase {
 			'/path/to/wp'
 		);
 		$results = $shell->parseArgs($arguments);
-		$expected = array('command', array(
-			'-o' => 'option',
-			'-k' => 'keyed',
-			'passed option',
-			'other passed option'
-		));
+		$expected = array(
+			'command', 
+			array(
+				'-o' => 'option',
+				'-k' => 'keyed'
+			),
+			array(
+				'passed option',
+				'other passed option'
+			)
+		);
 		$this->assertEquals($expected, $results);
 		
 		$results = $shell->wpPath;
