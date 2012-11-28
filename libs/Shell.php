@@ -49,12 +49,12 @@ class Shell {
 		$this->stdout = fopen('php://stdout', 'w');
 		$this->stderr = fopen('php://stderr', 'w');
 		
-		$this->args = $this->parseArgs($arguments);
+		list($method, $this->args) = $this->parseArgs($arguments);
 		
 		$config = $this->wpPath . DIRECTORY_SEPARATOR . 'wp-config.php';
 		if (!is_dir($this->wpPath) || !file_exists($config)) {
 			$this->out("Please pass the location of your WordPress install as the `-w` argument.\n");
-			$this->out("  $ php $arguments[0] -w /path/to/wordpress");
+			$this->out("  $ php $arguments[0] <command> -w /path/to/wordpress");
 			exit();
 		}
 		
@@ -62,24 +62,63 @@ class Shell {
 	}
 
 /**
- * Parses arguments sent by the CLI
+ * Parses arguments sent by the CLI in a very simplistic way. Saves any argument
+ * with a dash prefix, like `-t somevalue` and stores it as a key-value pair
+ * using the dash-prefixed char as the key and the following key as the value.
+ * The remaining arguments are saved as indexed values. The first argument is 
+ * always considered the command.
+ * 
+ * Example: pass `command -r Something Nothing -v Value
+ * Yields: 
+ * ```
+ * array(
+ *   'command',
+ *   array(
+ *     '-r' => 'Something',
+ *     '-v' => 'Value',
+ *     'Nothing'
+ *   )
+ * )
+ * ```
  * 
  * @param array $arguments `$argv` formatted arguments
  * @return array
  */
 	public function parseArgs($arguments) {
-		if (count($arguments) < 3) {
-			return array();
+		if (count($arguments) < 2) {
+			return array('help', array());
+		}
+		unset($arguments[0]);
+		$method = $arguments[1];
+		unset($arguments[1]);
+		
+		if (!method_exists($this, $method)) {
+			$arguments[1] = $method;
+			$method = 'help';
 		}
 		
-		$pathArg = array_search('-w', $arguments);
-		if ($pathArg !== false) {
-			$this->wpPath = trim($arguments[$pathArg+1], '\\/');
+		// look for keyed arguments (-s something)
+		$parsedArgs = array();
+		foreach ($arguments as $key => $arg) {
+			$this->out($arg);
+			if (strpos($arg, '-') !== false) {
+				$parsedArgs[$arg] = $arguments[$key+1];
+				unset($arguments[$key+1]);
+				unset($arguments[$key]);
+			}
 		}
+		
+		if (isset($parsedArgs['-w'])) {
+			$this->wpPath = rtrim($parsedArgs['-w'], '\\/');
+			unset($parsedArgs['-w']);
+		}
+		
+		// add standalone, ordered args
+		$parsedArgs += array_values($arguments);
 		
 		return array(
-			$arguments[1],
-			array_slice($arguments, 3)
+			$method,
+			$parsedArgs
 		);
 	}
 	
