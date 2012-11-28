@@ -7,7 +7,7 @@ $shell = new Shell($argv);
 // don't load the WP environment
 define('ABSPATH', './');
 
-require $shell->wpPath;
+require $shell->wpPath . DIRECTORY_SEPARATOR . 'wp-config.php';
 
 $connection = null;
 try {

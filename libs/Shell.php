@@ -33,11 +33,11 @@ class Shell {
 	protected $args = array();
 	
 /**
- * Path to WP config file
+ * Path to WordPress installation, without trailing DS
  * 
  * @var string
  */
-	public $wpPath = null;
+	public $wpPath = false;
 	
 /**
  * Creates file descriptors and outputs welcome message
@@ -51,9 +51,10 @@ class Shell {
 		
 		$this->args = $this->parseArgs($arguments);
 		
-		if (!file_exists($this->wpPath) || is_dir($this->wpPath)) {
-			$this->out("Please pass the location of your `wp-config.php` file as the first argument.\n");
-			$this->out("  $ wp-tools.php /path/to/wp-config.php");
+		$config = $this->wpPath . DIRECTORY_SEPARATOR . 'wp-config.php';
+		if (!is_dir($this->wpPath) || !file_exists($config)) {
+			$this->out("Please pass the location of your WordPress install as the `-w` argument.\n");
+			$this->out("  $ php $arguments[0] -w /path/to/wordpress");
 			exit();
 		}
 		
@@ -67,11 +68,16 @@ class Shell {
  * @return array
  */
 	public function parseArgs($arguments) {
-		if (count($arguments) < 2) {
+		if (count($arguments) < 3) {
 			return array();
 		}
-		$this->wpPath = $arguments[1];
-		return array_slice($arguments, 2);
+		
+		$pathArg = array_search('-w', $arguments);
+		if ($pathArg !== false) {
+			$this->wpPath = trim($arguments[$pathArg+1], '\\/');
+		}
+		
+		return array_slice($arguments, 3);
 	}
 	
 /**
