@@ -55,6 +55,7 @@ class Shell {
 		if (!is_dir($this->wpPath) || !file_exists($config)) {
 			$this->out("Please pass the location of your WordPress install as the `-w` argument.\n");
 			$this->out("  $ php $arguments[0] <command> -w /path/to/wordpress");
+			$this->help();
 			exit();
 		}
 		
@@ -131,6 +132,15 @@ class Shell {
 		$this->out("** All changes are made directly to the database and therefore permanent!");
 		$this->out("** Make sure to back it up before attempting to move it.\n");
 		$this->out('hr');
+	}
+	
+/**
+ * Outputs help message
+ */	
+	protected function help() {
+		$this->out("\n", false);
+		$this->out("Commands:");
+		$this->out("  - `help`: Display this help message");
 	}
 
 /**
