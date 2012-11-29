@@ -1,18 +1,25 @@
 # WP Tools
 
-> Note: the name is misleading at the moment because there is only one "tool,"
-> which is a shell that helps move the database around environments. I have plans
-> to add more functionality.
-
-WordPress hardcodes all of its urls, making it difficult to move databases 
-between environments. This is a simple PHP shell to help alleviate that pain.
+WP Tools is a shell for maintaining WordPress databases.
 
 ## Usage
 
 To run the shell, simply run the php script from the command line and pass the
-location of your WordPress `wp-config.php` config file as the first argument.
+location of your WordPress installation as the `-w` argument along with a
+command:
 
-    $ php wp-move.php /path/to/wp-config.php
+    $ php wp-tools.php <command> -w /path/to/wordpress
+
+## Commands
+
+- `help`: Display help
+- `move`: Move WP database entries to a new domain
+
+### `move` command
+
+WordPress hardcodes all of its urls, making it difficult to move databases 
+between environments. This command helps alleviate that pain by performing all
+of the repetitive database tasks for you.
 
 ## License
 
