@@ -40,6 +40,15 @@ class Shell {
 	public $wpPath = false;
 	
 /**
+ * Whitelist of commands that can be run
+ * 
+ * @var array 
+ */
+	protected $commands = array(
+		'help'
+	);
+	
+/**
  * Creates file descriptors and outputs welcome message
  * 
  * @param array $arguments Shell args (usually from `$argv`)
@@ -49,15 +58,11 @@ class Shell {
 		$this->stdout = fopen('php://stdout', 'w');
 		$this->stderr = fopen('php://stderr', 'w');
 		
-		list($method, $this->args) = $this->parseArgs($arguments);
+		list($method, $this->args, $passedArgs) = $this->parseArgs($arguments);
 		
-		$config = $this->wpPath . DIRECTORY_SEPARATOR . 'wp-config.php';
-		if (!is_dir($this->wpPath) || !file_exists($config)) {
-			$this->out("Please pass the location of your WordPress install as the `-w` argument.\n");
-			$this->out("  $ php $arguments[0] <command> -w /path/to/wordpress");
-			$this->help();
-			exit();
-		}
+		$this->loadWP();
+		
+		call_user_func_array(array($this, $method), $passedArgs);
 		
 		$this->welcome();
 	}
@@ -95,15 +100,13 @@ class Shell {
 		$method = $arguments[1];
 		unset($arguments[1]);
 		
-		if (!method_exists($this, $method)) {
-			$arguments[1] = $method;
+		if (!in_array($method, $this->commands)) {
 			$method = 'help';
 		}
 		
 		// look for keyed arguments (-s something)
 		$parsedArgs = array();
 		foreach ($arguments as $key => $arg) {
-			$this->out($arg);
 			if (strpos($arg, '-') !== false) {
 				$parsedArgs[$arg] = $arguments[$key+1];
 				unset($arguments[$key+1]);
@@ -186,5 +189,19 @@ class Shell {
  */
 	public function error($msg = '') {
 		fwrite($this->stderr, $msg."\n");
+	}
+
+/**
+ * Loads WordPress config file. If it can't be found, the help message is
+ * displayed and the shell exits.
+ */
+	protected function loadWP() {
+		$config = $this->wpPath . DIRECTORY_SEPARATOR . 'wp-config.php';
+		if (!is_dir($this->wpPath) || !file_exists($config)) {
+			$this->out("Please pass the location of your WordPress install as the `-w` argument.\n");
+			$this->out("  $ php wp-tools.php <command> -w /path/to/wordpress");
+			$this->help();
+			exit();
+		}
 	}
 }
