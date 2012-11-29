@@ -4,11 +4,11 @@ WP Tools is a shell for maintaining WordPress databases.
 
 ## Usage
 
-To run the shell, simply run the php script from the command line and pass the
+To run the shell, simply run `wp-tools` from the command line and pass the
 location of your WordPress installation as the `-w` argument along with a
 command:
 
-    $ php wp-tools.php <command> -w /path/to/wordpress
+    $ wp-tools <command> -w /path/to/wordpress
 
 ## Commands
 

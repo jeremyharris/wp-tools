@@ -297,7 +297,7 @@ class Shell {
 		$config = $this->wpPath . DIRECTORY_SEPARATOR . 'wp-config.php';
 		if (!is_dir($this->wpPath) || !file_exists($config)) {
 			$this->out("Please pass the location of your WordPress install as the `-w` argument.\n");
-			$this->out("  $ php wp-tools.php <command> -w /path/to/wordpress");
+			$this->out("  $ wp-tools <command> -w /path/to/wordpress");
 			$this->help();
 			exit();
 		}
