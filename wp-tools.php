@@ -3,12 +3,6 @@
 require 'libs' . DIRECTORY_SEPARATOR . 'Shell.php';
 
 $shell = new Shell($argv);
-
-// don't load the WP environment
-define('ABSPATH', './');
-
-require $shell->wpPath . DIRECTORY_SEPARATOR . 'wp-config.php';
-
 $connection = null;
 try {
 	$connection = new PDO(

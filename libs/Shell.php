@@ -40,6 +40,13 @@ class Shell {
 	public $wpPath = false;
 	
 /**
+ * Table prefix global var
+ * 
+ * @var string
+ */
+	public $table_prefix;
+	
+/**
  * Whitelist of commands that can be run
  * 
  * @var array 
@@ -192,6 +199,17 @@ class Shell {
 	}
 
 /**
+ * Error handler to output CLI-friendly errors
+ * 
+ * @param int $errorno
+ * @param string $errormsg
+ */
+	public function php_error($errorno, $errormsg) {
+		$this->error("PHP ERROR: $errormsg");
+	}
+
+
+/**
  * Loads WordPress config file. If it can't be found, the help message is
  * displayed and the shell exits.
  */
@@ -203,5 +221,14 @@ class Shell {
 			$this->help();
 			exit();
 		}
+		
+		// don't load the WP environment
+		define('ABSPATH', './');
+
+		require $config;
+		
+		$this->table_prefix = $table_prefix;
+		
+		set_error_handler(array($this, 'php_error'), E_ALL);
 	}
 }
