@@ -37,7 +37,7 @@ if ($scheme == 'q') {
 }
 
 $shell->out("\n", false);
-$shell->out("Please type the domain you wish to move the following doma$shell->in(s) to,");
+$shell->out("Please type the domain you wish to move the following domain(s) to,");
 $shell->out("excluding the scheme:");
 $shell->out("  s: skip current blog");
 $shell->out("  q: quit shell\n");
