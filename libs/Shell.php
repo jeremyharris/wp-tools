@@ -70,9 +70,9 @@ class Shell {
 		
 		$this->loadWP();
 		
-		call_user_func_array(array($this, $method), $passedArgs);
-		
 		$this->welcome();
+		
+		call_user_func_array(array($this, $method), $passedArgs);
 	}
 
 /**
