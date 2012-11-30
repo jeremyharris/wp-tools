@@ -177,4 +177,37 @@ class ShellTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $results);
 	}
 	
+	public function testLoadWP() {
+		$arguments = array(
+			 'scriptname',
+			 'command',
+			 '-w',
+			 __DIR__ . DIRECTORY_SEPARATOR . 'wordpress/'
+		);
+		$shell = $this->getMock('ShellMock', array('out', 'error', 'in'), array($arguments));
+		
+		$results = $shell->wpPath;
+		$expected = __DIR__ . DIRECTORY_SEPARATOR . 'wordpress';
+		$this->assertEquals($expected, $results);
+		
+		$results = $shell->table_prefix;
+		$expected = 'prefix_';
+		$this->assertEquals($expected, $results);
+		
+		$this->assertTrue(defined('DB_NAME'));
+		
+		$arguments = array(
+			 'scriptname',
+			 'command',
+			 '-w',
+			 __DIR__ . DIRECTORY_SEPARATOR . 'wordpress\\'
+		);
+		
+		$shell = $this->getMock('ShellMock', array('out', 'error', 'in'), array($arguments));
+		
+		$results = $shell->wpPath;
+		$expected = __DIR__ . DIRECTORY_SEPARATOR . 'wordpress';
+		$this->assertEquals($expected, $results);
+	}
+	
 }

@@ -115,7 +115,7 @@ class Shell {
 		// look for keyed arguments (-s something)
 		$parsedArgs = array();
 		foreach ($arguments as $key => $arg) {
-			if (strpos($arg, '-') !== false) {
+			if (strpos($arg, '-') === 0) {
 				$parsedArgs[$arg] = $arguments[$key+1];
 				unset($arguments[$key+1]);
 				unset($arguments[$key]);
@@ -303,7 +303,7 @@ class Shell {
 		}
 		
 		// don't load the WP environment
-		define('ABSPATH', './');
+		define('ABSPATH', '../');
 
 		require $config;
 		
