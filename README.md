@@ -1,6 +1,6 @@
 # WP Tools
 
-WP Tools is a shell for maintaining WordPress databases.
+WP Tools is a collection of shell commands for maintaining WordPress databases.
 
 ## Usage
 
