@@ -1,6 +1,6 @@
 <?php
 
-require '..' . DIRECTORY_SEPARATOR . 'libs' . DIRECTORY_SEPARATOR . 'Shell.php';
+require dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'libs' . DIRECTORY_SEPARATOR . 'Shell.php';
 
 class ShellMock extends Shell {
 	
@@ -176,18 +176,18 @@ class ShellTest extends PHPUnit_Framework_TestCase {
 		$expected = 'optionvalue';
 		$this->assertEquals($expected, $results);
 	}
-	
+
 	public function testLoadWP() {
 		$arguments = array(
 			 'scriptname',
 			 'command',
 			 '-w',
-			 __DIR__ . DIRECTORY_SEPARATOR . 'wordpress/'
+			 dirname(__FILE__) . DIRECTORY_SEPARATOR . 'wordpress_multi/'
 		);
 		$shell = $this->getMock('ShellMock', array('out', 'error', 'in'), array($arguments));
 		
 		$results = $shell->wpPath;
-		$expected = __DIR__ . DIRECTORY_SEPARATOR . 'wordpress';
+		$expected = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'wordpress_multi';
 		$this->assertEquals($expected, $results);
 		
 		$results = $shell->table_prefix;
@@ -195,18 +195,19 @@ class ShellTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $results);
 		
 		$this->assertTrue(defined('DB_NAME'));
+		$this->assertFalse(defined('WRONG_WP_SETTINGS_LOADED'));
 		
 		$arguments = array(
 			 'scriptname',
 			 'command',
 			 '-w',
-			 __DIR__ . DIRECTORY_SEPARATOR . 'wordpress\\'
+			 dirname(__FILE__) . DIRECTORY_SEPARATOR . 'wordpress_multi\\'
 		);
 		
 		$shell = $this->getMock('ShellMock', array('out', 'error', 'in'), array($arguments));
 		
 		$results = $shell->wpPath;
-		$expected = __DIR__ . DIRECTORY_SEPARATOR . 'wordpress';
+		$expected = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'wordpress_multi';
 		$this->assertEquals($expected, $results);
 	}
 	

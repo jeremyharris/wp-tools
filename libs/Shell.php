@@ -303,7 +303,7 @@ class Shell {
 		}
 		
 		// don't load the WP environment
-		define('ABSPATH', '../');
+		define('ABSPATH', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR);
 
 		require $config;
 		
