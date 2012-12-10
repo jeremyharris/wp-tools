@@ -47,6 +47,13 @@ class Shell {
 	public $table_prefix;
 	
 /**
+ * PDO connection
+ * 
+ * @var PDO
+ */
+	public $connection = null;
+	
+/**
  * Whitelist of commands that can be run
  * 
  * @var array 
@@ -214,18 +221,7 @@ class Shell {
  * Moves DB from one domain to another
  */
 	public function move() {
-		$connection = null;
-		try {
-			$connection = new PDO(
-				'mysql:host='.DB_HOST.';dbname='.DB_NAME,
-				DB_USER,
-				DB_PASSWORD,
-				array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
-			);
-		} catch (PDOException $e) {
-			$this->error($e->getMessage());
-			exit();
-		}
+		$connection = $this->getConnection();
 
 		$query = $connection->prepare("SELECT * FROM `{$this->table_prefix}blogs` WHERE `deleted` = 0;");
 		try {
@@ -310,5 +306,28 @@ class Shell {
 		$this->table_prefix = $table_prefix;
 		
 		set_error_handler(array($this, 'php_error'), E_ALL);
+	}
+
+/**
+ * Gets a connection to the WP database and returns it
+ * 
+ * @return PDO
+ */
+	protected function getConnection() {
+		if ($this->connection !== null) {
+			return $this->connection;
+		}
+		try {
+			$this->connection = new PDO(
+				'mysql:host='.DB_HOST.';dbname='.DB_NAME,
+				DB_USER,
+				DB_PASSWORD,
+				array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
+			);
+			return $this->connection;
+		} catch (PDOException $e) {
+			$this->error($e->getMessage());
+			exit();
+		}
 	}
 }

@@ -18,6 +18,10 @@ class ShellMock extends Shell {
 	public function loadWP() {
 		return parent::loadWP();
 	}
+	
+	public function getConnection() {
+		return parent::getConnection();
+	}
 }
 
 class ShellTest extends PHPUnit_Framework_TestCase {
@@ -209,6 +213,25 @@ class ShellTest extends PHPUnit_Framework_TestCase {
 		$results = $shell->wpPath;
 		$expected = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'wordpress_multi';
 		$this->assertEquals($expected, $results);
+	}
+	
+	function testGetConnection() {
+		$arguments = array(
+			 'scriptname',
+			 'command',
+			 '-w',
+			 dirname(__FILE__) . DIRECTORY_SEPARATOR . 'wordpress_multi/'
+		);
+		$shell = $this->getMock('ShellMock', array('out', 'error', 'in'), array($arguments));
+		
+		$this->assertTrue($shell->connection === null);
+		$connection = $shell->getConnection();
+		$this->assertInstanceOf('PDO', $connection);
+		$this->assertInstanceOf('PDO', $shell->connection);
+		
+		$expected = $shell->connection;
+		$result = $shell->getConnection();
+		$this->assertSame($expected, $result);
 	}
 	
 }
