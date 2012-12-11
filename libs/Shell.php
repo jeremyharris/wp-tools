@@ -228,13 +228,13 @@ class Shell {
 			$query->execute();
 		} catch (PDOException $e) {
 			$this->error($e->getMessage());
-			exit();
+			return;
 		}
 
 		$this->out("\n", false);
 		$scheme = $this->in("Choose a scheme [http|https]");
 		if ($scheme == 'q') {
-			exit();
+			return;
 		}
 
 		$this->out("\n", false);
@@ -250,7 +250,7 @@ class Shell {
 			}
 			$new = $this->in("($blog->blog_id) $blog->domain");
 			if ($new == 'q') {
-				exit();
+				return;
 			}
 			if ($new == 's') {
 				$this->out("Skipped moving $blog->domain\n");
@@ -290,6 +290,11 @@ class Shell {
  * displayed and the shell exits.
  */
 	protected function loadWP() {
+		if (defined('ABSPATH')) {
+			// we've already loaded a config
+			return;
+		}
+		
 		$config = $this->wpPath . DIRECTORY_SEPARATOR . 'wp-config.php';
 		if (!is_dir($this->wpPath) || !file_exists($config)) {
 			$this->out("Please pass the location of your WordPress install as the `-w` argument.\n");

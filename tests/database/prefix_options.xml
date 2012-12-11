@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="test">
+	<table_data name="prefix_options">
+		<row>
+			<field name="option_id">1</field>
+			<field name="option_name">siteurl</field>
+			<field name="option_value">http://wordpress.local</field>
+		</row>
+		<row>
+			<field name="option_id">2</field>
+			<field name="option_name">home</field>
+			<field name="option_value">http://wordpress.local</field>
+		</row>
+	</table_data>
+</database>
+</mysqldump>
