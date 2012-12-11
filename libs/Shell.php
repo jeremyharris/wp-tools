@@ -232,14 +232,7 @@ class Shell {
 		}
 
 		$this->out("\n", false);
-		$scheme = $this->in("Choose a scheme [http|https]");
-		if ($scheme == 'q') {
-			return;
-		}
-
-		$this->out("\n", false);
-		$this->out("Please type the domain you wish to move the following domain(s) to,");
-		$this->out("excluding the scheme:");
+		$this->out("Please type the domain you wish to move the following domain(s) to:");
 		$this->out("  s: skip current blog");
 		$this->out("  q: quit shell\n");
 
@@ -258,15 +251,20 @@ class Shell {
 			}
 
 			try {
+				$newHost = stripos($new, 'http') !== false ? parse_url($new, PHP_URL_HOST) : $new;
+				$oldHost = stripos($blog->domain, 'http') !== false ? parse_url($blog->domain, PHP_URL_HOST) : $blog->domain;
+				$values = array(':new' => $newHost, ':old' => $oldHost);
+				
 				$connection->exec("BEGIN");
+				
 				$update = $connection->prepare("UPDATE `{$this->table_prefix}blogs` SET `domain` = :new WHERE `domain` = :old");
-				$blogUpdate = $update->execute(array(':new' => $new, ':old' => $blog->domain));
-				$update = $connection->prepare("UPDATE `{$prefix}options` SET `option_value` = :new WHERE `option_name` = 'siteurl';");
-				$siteurlUpdate = $update->execute(array(':new' => "$scheme://$new"));
-				$update = $connection->prepare("UPDATE `{$prefix}options` SET `option_value` = :new WHERE `option_name` = 'home';");
-				$homeUpdate = $update->execute(array(':new' => "$scheme://$new"));
+				$blogUpdate = $update->execute($values);
+				$update = $connection->prepare("UPDATE `{$prefix}options` SET `option_value` = REPLACE(`option_value`, :old, :new) WHERE `option_name` = 'siteurl';");
+				$siteurlUpdate = $update->execute($values);
+				$update = $connection->prepare("UPDATE `{$prefix}options` SET `option_value` = REPLACE(`option_value`, :old, :new) WHERE `option_name` = 'home';");
+				$homeUpdate = $update->execute($values);
 				$update = $connection->prepare("UPDATE `{$prefix}posts` SET `guid` = REPLACE(`guid`, :old, :new);");
-				$postsUpdate = $update->execute(array(':new' => $new, ':old' => $blog->domain));
+				$postsUpdate = $update->execute($values);
 
 				if (!$blogUpdate || !$siteurlUpdate || !$homeUpdate || !$postsUpdate) {
 					$connection->exec("ROLLBACK");

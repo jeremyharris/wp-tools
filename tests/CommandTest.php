@@ -193,19 +193,36 @@ class CommandTest extends PHPUnit_Extensions_Database_TestCase {
 		));
 		$this->loadDataSet($ds);
 		
-		// answer prompts (rename first, quit after)
+		// answer prompts for this test method
 		$this->Shell
 			->expects($this->any())
 			->method('in')
-			->will($this->onConsecutiveCalls('https', 'secure.example.com', 'q'));
+			->will($this->onConsecutiveCalls(
+				'https://secure.example.com',
+				'q',
+				'securer.example.com',
+				'q'
+			));
 		
 		$this->Shell->move();
 		
 		$expected = array(
-			'https://secure.example.com/?p=1',
-			'https://secure.example.com/?page_id=2',
-			'https://secure.example.com/?p=3',
-			'https://secure.example.com/?p=5'
+			'http://secure.example.com/?p=1',
+			'http://secure.example.com/?page_id=2',
+			'http://secure.example.com/?p=3',
+			'http://secure.example.com/?p=5'
+		);
+		$query = $this->Shell->getConnection()->query('SELECT guid FROM prefix_posts;');
+		$results = $query->fetchAll(PDO::FETCH_COLUMN);
+		$this->assertEquals($expected, $results);
+		
+		$this->Shell->move();
+		
+		$expected = array(
+			'http://securer.example.com/?p=1',
+			'http://securer.example.com/?page_id=2',
+			'http://securer.example.com/?p=3',
+			'http://securer.example.com/?p=5'
 		);
 		$query = $this->Shell->getConnection()->query('SELECT guid FROM prefix_posts;');
 		$results = $query->fetchAll(PDO::FETCH_COLUMN);
@@ -228,7 +245,7 @@ class CommandTest extends PHPUnit_Extensions_Database_TestCase {
 		$this->Shell
 			->expects($this->any())
 			->method('in')
-			->will($this->onConsecutiveCalls('http', 's', 'sub1.example.org', 'sub2.example.org'));
+			->will($this->onConsecutiveCalls('s', 'http://sub1.example.org', 'sub2.example.org'));
 		
 		$this->Shell->move();
 		
