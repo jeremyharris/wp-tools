@@ -274,6 +274,7 @@ class Shell {
 				$this->out("Moved $blog->domain to $new\n");
 				$connection->exec("COMMIT");
 			} catch (PDOException $e) {
+				$connection->exec("ROLLBACK");
 				$this->error($e->getMessage());
 				continue;
 			}

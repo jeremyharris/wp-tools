@@ -75,7 +75,7 @@ class CommandTest extends PHPUnit_Extensions_Database_TestCase {
 			 '-w',
 			 dirname(__FILE__) . DIRECTORY_SEPARATOR . 'wordpress_multi/'
 		);
-		$this->Shell = $this->getMock('CommandTestShell', array('in', 'out', 'err', 'getConnection', '_quit'), array($arguments));
+		$this->Shell = $this->getMock('CommandTestShell', array('in', 'out', 'error', 'getConnection', '_quit'), array($arguments));
 		$this->Shell
 			->expects($this->any())
 			->method('getConnection')
@@ -272,6 +272,32 @@ class CommandTest extends PHPUnit_Extensions_Database_TestCase {
 			'http://sub2.example.org/?page_id=2'
 		);
 		$query = $this->Shell->getConnection()->query('SELECT guid FROM prefix_3_posts;');
+		$results = $query->fetchAll(PDO::FETCH_COLUMN);
+		$this->assertEquals($expected, $results);
+	}
+	
+	function testTransactionFail() {
+		$ds = $this->getDataSet(array(
+			'prefix_site',
+			'prefix_blogs'
+		));
+		$this->loadDataSet($ds);
+		$this->Shell->getConnection()->exec('DROP TABLE `prefix_posts`;');
+		
+		$this->Shell
+			->expects($this->any())
+			->method('in')
+			->will($this->onConsecutiveCalls('http://sub1.example.org', 'q'));
+		
+		// this fails because prefix_posts is missing and the db update on it will fail
+		$this->Shell->move();
+		
+		$expected = array(
+			'wordpress.local',
+			'site2.wordpress.local',
+			'site3.wordpress.local'
+		);
+		$query = $this->Shell->getConnection()->query('SELECT domain FROM prefix_blogs;');
 		$results = $query->fetchAll(PDO::FETCH_COLUMN);
 		$this->assertEquals($expected, $results);
 	}
