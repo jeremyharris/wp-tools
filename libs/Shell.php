@@ -334,4 +334,21 @@ class Shell {
 			exit();
 		}
 	}
+
+/**
+ * Takes a `dashed-word` and returns it as a `camelcaseWord`
+ * 
+ * @param string $out Dashed word
+ * @return string camelcaseWord
+ */
+	protected function camelcase($out = '') {
+		if (stripos($out, '-') !== false) {
+			$words = explode('-', $out);
+			$out = array_shift($words);
+			foreach ($words as $word) {
+				$out .= ucfirst($word);
+			}
+		}
+		return $out;
+	}
 }

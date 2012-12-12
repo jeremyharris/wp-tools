@@ -22,6 +22,10 @@ class ShellMock extends Shell {
 	public function getConnection() {
 		return parent::getConnection();
 	}
+	
+	public function camelcase($word = '') {
+		return parent::camelcase($word);
+	}
 }
 
 class ShellTest extends PHPUnit_Framework_TestCase {
@@ -234,4 +238,11 @@ class ShellTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame($expected, $result);
 	}
 	
+	public function testCamelcase() {
+		$shell = $this->getMock('ShellMock', array('out', 'error', 'in'), array(), '', false);
+		
+		$expected = 'someMethod';
+		$result = $shell->camelcase('some-method');
+		$this->assertEquals($expected, $result);
+	}
 }
