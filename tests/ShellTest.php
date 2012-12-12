@@ -215,14 +215,14 @@ class ShellTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $results);
 	}
 	
-	function testGetConnection() {
+	public function testGetConnection() {
 		$arguments = array(
 			 'scriptname',
 			 'command',
 			 '-w',
 			 dirname(__FILE__) . DIRECTORY_SEPARATOR . 'wordpress_multi/'
 		);
-		$shell = $this->getMock('ShellMock', array('out', 'error', 'in'), array($arguments));
+		$shell = $this->getMock('ShellMock', array('out', 'error', 'in'), array($arguments), '', false);
 		
 		$this->assertTrue($shell->connection === null);
 		$connection = $shell->getConnection();
