@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="test">
+	<table_data name="prefix_2_postmeta">
+		<row>
+			<field name="meta_id">1</field>
+			<field name="post_id">1</field>
+			<field name="meta_key">some_meta</field>
+			<field name="meta_value">This goes to post 1</field>
+		</row>
+		<row>
+			<field name="meta_id">2</field>
+			<field name="post_id">1</field>
+			<field name="meta_key">MetaKey</field>
+			<field name="meta_value">MetaValue</field>
+		</row>
+	</table_data>
+</database>
+</mysqldump>

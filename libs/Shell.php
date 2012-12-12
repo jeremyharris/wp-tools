@@ -60,7 +60,8 @@ class Shell {
  */
 	protected $commands = array(
 		'help',
-		'move'
+		'move',
+		'clean-orphans'
 	);
 	
 /**
@@ -78,6 +79,8 @@ class Shell {
 		$this->loadWP();
 		
 		$this->welcome();
+		
+		$method = $this->camelcase($method);
 		
 		call_user_func_array(array($this, $method), $passedArgs);
 	}
@@ -160,6 +163,7 @@ class Shell {
 		$this->out("Commands:");
 		$this->out("  - `help`: Display this help message");
 		$this->out("  - `move`: Move WP database entries to a new domain");
+		$this->out("  - `clean-orphans`: Remove old, unused metadata");
 	}
 
 /**
@@ -276,6 +280,51 @@ class Shell {
 
 		$this->out("Finished.\n");
 		$this->out("Make sure to change the DOMAIN_CURRENT_SITE constant in `wp-config.php`");
+	}
+
+/**
+ * Removes post meta that doesn't belong to an existing post
+ */	
+	public function cleanOrphans() {
+		$connection = $this->getConnection();
+		$blogs = $this->getBlogs();
+
+		foreach ($blogs as $id => $domain) {
+			$prefix = $this->table_prefix;
+			if ($id != BLOG_ID_CURRENT_SITE || $id === 0) {
+				$prefix = $this->table_prefix.$id.'_';
+			}
+			
+			// get orphaned metadata
+			$query = $connection->prepare("
+				SELECT `meta_id`
+				FROM `{$prefix}postmeta` as pm
+				LEFT JOIN `{$prefix}posts` as p ON (`pm`.`post_id` = `p`.`ID`)
+				WHERE `p`.`ID` IS NULL;
+			");
+			try {
+				$query->execute();
+				$results = $query->fetchAll(PDO::FETCH_COLUMN);
+				$count = count($results);
+				
+				if (empty($results)) {
+					$this->out("No orphaned meta records found for $domain");
+					continue;
+				}
+				
+				$deleteQuery = $connection->prepare("DELETE FROM `{$prefix}postmeta` WHERE `meta_id` IN (".implode(',', $results).")");
+				$deleted = $deleteQuery->execute();
+				
+				if ($deleted) {
+					$this->out("$count orphaned meta record(s) removed for $domain");
+				} else {
+					$this->out("Could not remove orphaned meta records for $domain");
+				}
+			} catch (PDOException $e) {
+				$this->error($e->getMessage());
+				continue;
+			}
+		}
 	}
 
 /**

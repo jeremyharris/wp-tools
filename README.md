@@ -14,12 +14,19 @@ command:
 
 - `help`: Display help
 - `move`: Move WP database entries to a new domain
+- `clean-orphans`: Remove old, unused metadata
 
-### `move` command
+### `move`
 
 WordPress hardcodes all of its urls, making it difficult to move databases 
 between environments. This command helps alleviate that pain by performing all
 of the repetitive database tasks for you.
+
+### `clean-orphans`
+
+Often times you can end up with extra cruft in your `postmeta` table. This
+command will run through and remove any post meta that doesn't belong to an
+existing post anymore.
 
 ## License
 

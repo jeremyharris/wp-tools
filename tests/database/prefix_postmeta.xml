@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="test">
+	<table_data name="prefix_postmeta">
+		<row>
+			<field name="meta_id">1</field>
+			<field name="post_id">1</field>
+			<field name="meta_key">Something</field>
+			<field name="meta_value">For Nothing</field>
+		</row>
+		<row>
+			<field name="meta_id">2</field>
+			<field name="post_id">2</field>
+			<field name="meta_key">MetaKey</field>
+			<field name="meta_value">MetaValue</field>
+		</row>
+		<row>
+			<field name="meta_id">3</field>
+			<field name="post_id">1000</field>
+			<field name="meta_key">Orphaned</field>
+			<field name="meta_value">Value</field>
+		</row>
+		<row>
+			<field name="meta_id">4</field>
+			<field name="post_id">1001</field>
+			<field name="meta_key">Orphaned</field>
+			<field name="meta_value">Value</field>
+		</row>
+	</table_data>
+</database>
+</mysqldump>
