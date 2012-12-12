@@ -3,7 +3,7 @@
 require dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'libs' . DIRECTORY_SEPARATOR . 'Shell.php';
 require dirname(__FILE__) . DIRECTORY_SEPARATOR . 'WPToolsDatabaseTestCase.php';
 
-class CommandTest extends WPToolsDatabaseTestCase {
+class MoveTest extends WPToolsDatabaseTestCase {
 
 	public function testQuit() {
 		$ds = $this->getDataSet(array(
