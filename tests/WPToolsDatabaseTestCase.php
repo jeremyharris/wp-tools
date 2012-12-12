@@ -6,6 +6,9 @@ class ShellProxy extends Shell {
 	public function getConnection() {
 		return parent::getConnection();
 	}
+	public function getBlogs() {
+		return parent::getBlogs();
+	}
 	public function _quit() {
 		return parent::_quit();
 	}
@@ -16,6 +19,13 @@ class ShellProxy extends Shell {
  * fixture tables and drops them on tear down.
  */
 class WPToolsDatabaseTestCase extends PHPUnit_Extensions_Database_TestCase {
+	
+/**
+ * WP install suffix, for getting the right `wp-config.php`
+ * 
+ * @var string
+ */
+	protected $install = 'multi';
 	
 /**
  * Stored table prefix, since we can't reload the WP config more than once
@@ -39,6 +49,7 @@ class WPToolsDatabaseTestCase extends PHPUnit_Extensions_Database_TestCase {
 		'prefix_options',
 		'prefix_2_options',
 		'prefix_3_options',
+		'single_options',
 	);
 	
 /**
@@ -76,7 +87,7 @@ class WPToolsDatabaseTestCase extends PHPUnit_Extensions_Database_TestCase {
 			 'scriptname',
 			 'help',
 			 '-w',
-			 dirname(__FILE__) . DIRECTORY_SEPARATOR . 'wordpress_multi/'
+			 dirname(__FILE__) . DIRECTORY_SEPARATOR . "wordpress_$this->install/"
 		);
 		$this->Shell = $this->getMock('ShellProxy', array('in', 'out', 'error', 'getConnection', '_quit'), array($arguments));
 		$this->Shell

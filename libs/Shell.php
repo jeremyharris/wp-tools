@@ -223,36 +223,30 @@ class Shell {
 	public function move() {
 		$connection = $this->getConnection();
 
-		$query = $connection->prepare("SELECT * FROM `{$this->table_prefix}blogs` WHERE `deleted` = 0;");
-		try {
-			$query->execute();
-		} catch (PDOException $e) {
-			$this->error($e->getMessage());
-			return;
-		}
-
 		$this->out("\n", false);
 		$this->out("Please type the domain you wish to move the following domain(s) to:");
 		$this->out("  s: skip current blog");
 		$this->out("  q: quit shell\n");
+		
+		$blogs = $this->getBlogs();
 
-		while ($blog = $query->fetch(PDO::FETCH_OBJ)) {
+		foreach ($blogs as $id => $domain) {
 			$prefix = $this->table_prefix;
-			if ($blog->blog_id != BLOG_ID_CURRENT_SITE) {
-				$prefix = $this->table_prefix.$blog->blog_id.'_';
+			if ($id != BLOG_ID_CURRENT_SITE) {
+				$prefix = $this->table_prefix.$id.'_';
 			}
-			$new = $this->in("($blog->blog_id) $blog->domain");
+			$new = $this->in("($id) $domain");
 			if ($new == 'q') {
 				return;
 			}
 			if ($new == 's') {
-				$this->out("Skipped moving $blog->domain\n");
+				$this->out("Skipped moving $domain\n");
 				continue;
 			}
 
 			try {
 				$newHost = stripos($new, 'http') !== false ? parse_url($new, PHP_URL_HOST) : $new;
-				$oldHost = stripos($blog->domain, 'http') !== false ? parse_url($blog->domain, PHP_URL_HOST) : $blog->domain;
+				$oldHost = stripos($domain, 'http') !== false ? parse_url($domain, PHP_URL_HOST) : $domain;
 				$values = array(':new' => $newHost, ':old' => $oldHost);
 				
 				$connection->exec("BEGIN");
@@ -268,10 +262,10 @@ class Shell {
 
 				if (!$blogUpdate || !$siteurlUpdate || !$homeUpdate || !$postsUpdate) {
 					$connection->exec("ROLLBACK");
-					$this->out("Error moving $blog->domain to $new\n");
+					$this->out("Error moving $domain to $new\n");
 					continue;
 				}
-				$this->out("Moved $blog->domain to $new\n");
+				$this->out("Moved $domain to $new\n");
 				$connection->exec("COMMIT");
 			} catch (PDOException $e) {
 				$connection->exec("ROLLBACK");
@@ -350,5 +344,41 @@ class Shell {
 			}
 		}
 		return $out;
+	}
+
+/**
+ * Gets all blogs on this installation and returns them as a key-value pair,
+ * where the blog ID is the key and the value is the domain.
+ * 
+ * @return array
+ */
+	protected function getBlogs() {
+		$connection = $this->getConnection();
+		
+		if (defined('MULTISITE') && MULTISITE === true) {
+			$query = $connection->prepare("SELECT `blog_id`, `domain` FROM `{$this->table_prefix}blogs` WHERE `deleted` = 0;");
+			try {
+				$query->execute();
+			} catch (PDOException $e) {
+				$this->error($e->getMessage());
+				exit();
+			}
+			$results = $query->fetchAll();
+			$blogs = array();
+			foreach ($results as $row) {
+				$blogs[$row['blog_id']] = $row['domain'];
+			}
+		} else {
+			$query = $connection->prepare("SELECT `option_value` FROM `{$this->table_prefix}options` WHERE `option_name` = 'siteurl';");
+			try {
+				$query->execute();
+			} catch (PDOException $e) {
+				$this->error($e->getMessage());
+				exit();
+			}
+			$blogs = $query->fetchAll(PDO::FETCH_COLUMN);
+			$blogs[0] = preg_replace('/^https?:\/\//', '', $blogs[0]);
+		}
+		return $blogs;
 	}
 }

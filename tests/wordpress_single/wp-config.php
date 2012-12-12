@@ -9,10 +9,9 @@ define('DB_HOST', '127.0.0.1');
 define('DB_CHARSET', 'utf8');
 define('DB_COLLATE', '');
 
-define('MULTISITE', true);
 define('BLOG_ID_CURRENT_SITE', 1);
 
-$table_prefix  = 'prefix_';
+$table_prefix  = 'single_';
 
 if (!defined('ABSPATH')) {
 	define('ABSPATH', dirname(__FILE__) . '/');
